@@ -1,0 +1,185 @@
+
+{% include "header.html" %}
+
+<script>
+
+  function ready(callback){
+      // in case the document is already rendered
+      if (document.readyState!='loading') callback();
+      // modern browsers
+      else if (document.addEventListener) document.addEventListener('DOMContentLoaded', callback);
+      // IE <= 8
+      else document.attachEvent('onreadystatechange', function(){
+          if (document.readyState=='complete') callback();
+      });
+  }
+    
+  ready(function(){
+    /*
+    exampleModal = document.getElementById('exampleModal')
+    console.log(exampleModal)
+
+    if (exampleModal) {
+      console.log(exampleModal)
+      
+      exampleModal.addEventListener('show.bs.modal', event => {
+        // Button that triggered the modal
+        const button = event.relatedTarget
+        // Extract info from data-bs-* attributes
+        const recipient = button.getAttribute('data-bs-whatever')
+
+        // Update the modal's content.
+        const modalTitle = exampleModal.querySelector('.modal-title')
+        const modalBodyInput = exampleModal.querySelector('.form-control')
+
+        modalTitle.textContent = `New message to ${recipient}`
+        modalBodyInput.value = recipient
+      })
+    }
+    */
+
+    const deleteModal = document.getElementById('deleteModal')
+    if (deleteModal) {
+      deleteModal.addEventListener('show.bs.modal', event => {
+        // Button that triggered the modal
+        const button = event.relatedTarget;
+        // Extract info from data-bs-* attributes
+        const url = button.getAttribute('data-bs-url');
+        const name = button.getAttribute('data-bs-name');
+        console.log(name);
+
+        const deleteLink = deleteModal.querySelector('.delete-link');
+        const taskName = deleteModal.querySelector('.task-name');
+
+        taskName.innerHTML = name;
+        deleteLink.setAttribute('href', url);
+
+    })
+  }
+
+  })
+
+  
+  /*
+  const deleteModal = document.getElementById('deleteModal')
+  if (deleteModal) {
+    deleteModal.addEventListener('show.bs.modal', event => {
+      // Button that triggered the modal
+      const button = event.relatedTarget;
+      // Extract info from data-bs-* attributes
+      // const url = button.getAttribute('data-bs-url');
+      const name = button.getAttribute('data-bs-name');
+      console.log(name);
+
+      const taskName = deleteModal.querySelector('.task-name');
+
+      taskName.value = name;
+
+    })
+  }
+  */
+</script>
+
+<!-- As a heading -->
+<nav class="navbar fixed-top bg-dark">
+  <div class="container-fluid">
+    <span class="navbar-brand mb-0 h1 text-light">
+      <i class="bi bi-ui-checks"></i>
+      TaskR
+    </span>
+
+    <a href="{{ url_for('add')}}" class="bi bi-plus-circle-fill btn-plus" ></a>
+  </div>
+</nav>
+
+<main class="bg-dark">
+
+    <div class="container">
+
+      {% for t in tasks %}
+      <div class="row">
+        <div class="input-group">
+
+          {% if t.complete == 1 %}
+            {% if anim_id == t.id %}
+              <a href="{{ url_for('clicked', id=t.id) }}" class="btn btn-primary text-light outline-light chbx1" type="button"> <i class="bi bi-check-square-fill"></i></a>
+            {% else %}
+              <a href="{{ url_for('clicked', id=t.id) }}" class="btn btn-primary text-light outline-light" type="button"> <i class="bi bi-check-square-fill"></i></a>
+            {% endif %}
+          {% else %}
+            {% if anim_id == t.id %}
+              <a href="{{ url_for('clicked', id=t.id) }}" class="btn btn-dark text-light outline-light chbx0" type="button"> <i class="bi bi-square"></i></a>
+            {% else %}
+              <a href="{{ url_for('clicked', id=t.id) }}" class="btn btn-dark text-light outline-light" type="button"> <i class="bi bi-square"></i></a>
+            {% endif %}
+          {% endif %}
+
+          <label class="form-control outline-light" for="" aria-label="Text input with dropdown button"> {{t.name}} </label>
+          
+          <a href="{{ url_for('edit', id=t.id ) }}" class="btn btn-primary text-light outline-light" type="button"> <i class="bi bi-pen-fill" ></i></a>
+
+
+          <a class="btn btn-danger text-light outline-light" type="button" data-bs-toggle="modal" data-bs-target="#deleteModal" data-bs-name="{{t.name}}" data-bs-url="{{ url_for('delete', id=t.id) }}"> <i class="bi bi-trash-fill" ></i></a>
+
+        </div>
+      </div>
+      {% endfor %}
+
+
+      </div>  
+</main>
+
+<!-- Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content bg-dark">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5 text-light" id="deleteModalLabel">Delete ?</h1>
+        <button type="button" class="btn" data-bs-dismiss="modal" aria-label="Close">
+          <i class="bi bi-x-square-fill bg-dark text-muted fs-5"></i>
+        </button>
+        <!-- <a class="btn btn-dark text-light" aria-label="Close"><a> -->
+
+      </div>
+      <div class="modal-body text-light">
+        Sure you want to delete this?
+        <p class="task-name text-light"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+        <a class="btn bi bi-trash-fill bg-danger text-light delete-link" href="#!"> Delete </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">New message to @NOT_WORKING</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label for="recipient-name" class="col-form-label">Recipient:</label>
+            <input type="text" class="form-control" id="recipient-name">
+          </div>
+          <div class="mb-3">
+            <label for="message-text" class="col-form-label">Message:</label>
+            <textarea class="form-control" id="message-text"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Send message</button>
+      </div>
+    </div>
+  </div>
+</div> -->
+
+<!-- </body> -->
